@@ -1,4 +1,3 @@
-
 package com.eslam.sleeptracker.database
 
 import android.content.Context
@@ -7,23 +6,24 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [SleepNight::class], version = 1, exportSchema = false)
-abstract class SleepDatabase : RoomDatabase(){
+abstract class SleepDatabase : RoomDatabase() {
 
     abstract val sleepNightDao: SleepDatabaseDao
 
-    companion object{
+    companion object {
         @Volatile
         private var dataBaseInstance: SleepDatabase? = null
 
-        fun getDataBaseInstance(context: Context):SleepDatabase{
-            synchronized(this){
+        fun getDataBaseInstance(context: Context): SleepDatabase {
+            synchronized(this) {
                 var instance = dataBaseInstance
 
-                if (instance == null){
-                    instance = Room.databaseBuilder(context.applicationContext,
-                    SleepDatabase::class.java,
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        SleepDatabase::class.java,
                         "sleep_history_database"
-                        ).fallbackToDestructiveMigration()
+                    ).fallbackToDestructiveMigration()
                         .build()
 
                     dataBaseInstance = instance
