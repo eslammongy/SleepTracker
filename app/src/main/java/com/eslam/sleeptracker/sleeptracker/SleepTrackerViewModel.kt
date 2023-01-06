@@ -2,10 +2,7 @@
 package com.eslam.sleeptracker.sleeptracker
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.eslam.sleeptracker.database.SleepDatabaseDao
 import com.eslam.sleeptracker.database.SleepNight
 import com.eslam.sleeptracker.formatNights
@@ -18,9 +15,11 @@ class SleepTrackerViewModel(
         val database: SleepDatabaseDao,
         application: Application) : AndroidViewModel(application) {
 
-        private val viewModelJop= Job()
         private val recentNight = MutableLiveData<SleepNight?>()
         private val allNights = database.selectAllNights()
+        private val _navigateToSleepTrackerQuality = MutableLiveData<SleepNight?>()
+        val navigateToSleepTrackerQuality: LiveData<SleepNight?>
+                get() = _navigateToSleepTrackerQuality
 
         val nightsToString = Transformations.map(allNights){
                 formatNights(it, application.resources)
@@ -49,6 +48,9 @@ class SleepTrackerViewModel(
 
         }
 
+        fun doneNavigating() {
+                _navigateToSleepTrackerQuality.value = null
+        }
         private suspend fun insertNewNight(night: SleepNight){
                 database.insertSleepNight(night)
         }
@@ -75,6 +77,8 @@ class SleepTrackerViewModel(
                         oldestNight.endTimeMilli = System.currentTimeMillis()
 
                         updateNight(oldestNight)
+                        _navigateToSleepTrackerQuality.value = oldestNight
+
                 }
         }
 

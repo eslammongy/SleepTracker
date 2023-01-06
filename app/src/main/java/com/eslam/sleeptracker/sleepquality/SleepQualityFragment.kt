@@ -22,7 +22,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.eslam.sleeptracker.R
+import com.eslam.sleeptracker.database.SleepDatabase
 import com.eslam.sleeptracker.databinding.FragmentSleepQualityBinding
 
 class SleepQualityFragment : Fragment() {
@@ -35,6 +39,23 @@ class SleepQualityFragment : Fragment() {
                 inflater, R.layout.fragment_sleep_quality, container, false)
 
         val application = requireNotNull(this.activity).application
+
+        val arguments = SleepQualityFragmentArgs.fromBundle(requireArguments())
+        val dataSource = SleepDatabase.getDataBaseInstance(application).sleepNightDao
+
+        val sleepQualityViewModelFactory = SleepQualityViewModelFactory(arguments.sleepNightKey, dataSource)
+        val sleepQualityViewModel = ViewModelProvider(this, sleepQualityViewModelFactory)[SleepQualityViewModel::class.java]
+        binding.sleepQualityViewModel = sleepQualityViewModel
+
+        // Add an Observer to the state variable for Navigating when a Quality icon is tapped.
+        sleepQualityViewModel.navigateToSleepTracker.observe(viewLifecycleOwner, Observer {
+            if (it == true){
+                this.findNavController().navigate(SleepQualityFragmentDirections.actionSleepQualityFragmentToSleepTrackerFragment())
+                // Reset state to make sure we only navigate once, even if the device
+                // has a configuration change.
+                sleepQualityViewModel.doneNavigating()
+            }
+        })
 
         return binding.root
     }

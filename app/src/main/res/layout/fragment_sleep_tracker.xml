@@ -31,7 +31,7 @@
                 android:layout_marginStart="@dimen/margin"
                 android:layout_marginTop="@dimen/margin"
                 android:layout_marginEnd="@dimen/margin"
-                android:fontFamily="@font/righteous"
+                android:fontFamily="@font/roboto"
                 android:text="@{sleepTrackerViewModel.nightsToString}"
                 android:textSize="25sp" />
         </ScrollView>
